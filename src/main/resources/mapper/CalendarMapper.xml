@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="calMapper">
+<insert id="calInsert" parameterType="java.util.HashMap"  useGeneratedKeys="true">
+<selectKey keyProperty="CAL_ID" resultType="java.lang.String" order="BEFORE">
+select MAX(TO_NUMBER(CAL_ID))+1 from tb_calendar
+</selectKey>
+INSERT INTO TB_CALENDAR(CAL_ID,
+						cal_start,
+						cal_end,
+						cal_title,
+						cal_desc,
+						cal_rate,
+						cal_project,
+						frst_rgst_dt,
+						finl_updt_dt,
+						frst_rgpr,
+						finl_uppr)
+			VALUES(
+			#{CAL_ID,jdbcType=VARCHAR},
+			#{cal_start,jdbcType=VARCHAR},
+			#{cal_end,jdbcType=VARCHAR},
+			#{cal_title,jdbcType=VARCHAR},
+			#{cal_desc,jdbcType=VARCHAR},
+			#{cal_rate,jdbcType=VARCHAR},
+			#{cal_project,jdbcType=VARCHAR},
+			SYSDATE,
+			SYSDATE,
+			#{frst_rgpr,jdbcType=VARCHAR},
+			#{finl_uppr,jdbcType=VARCHAR})
+</insert>
+
+<!-- 사용자 일정 조회 -->
+<select id="selectcal" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select
+			 CAL_ID,
+			 CAL_START "start",
+			 CAL_END "end",
+			 CAL_TITLE "title",
+			 cal_desc,
+			 cal_rate,
+			 cal_project,
+			 (select pj_title from tb_project where pj_id = a.cal_project) cal_project_name ,
+			 frst_rgpr
+			from tb_calendar a
+		
+</select>
+
+<!-- 프로젝트 리스트 조회 -->
+<select id="selectproj" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+		select pj_id,
+		       pj_title 
+		from tb_project
+</select>
+
+
+ <select id="selectUser" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select uniq_no,
+			   name
+		from tb_user
+</select> 
+
+ <select id="selectUserN" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select uniq_no,
+			   id
+		from tb_user
+</select> 
+
+ <delete id="caldelete" parameterType="java.util.HashMap">
+	delete from tb_calendar
+	where CAL_ID=#{CAL_ID,jdbcType=VARCHAR}
+</delete>
+
+ <update id="calUp" parameterType="java.util.HashMap">
+ update tb_calendar
+ set 					
+ 						cal_start=#{cal_start,jdbcType=VARCHAR},
+						cal_end=#{cal_end,jdbcType=VARCHAR},
+						cal_title=#{cal_title,jdbcType=VARCHAR},
+						cal_desc=#{cal_desc,jdbcType=VARCHAR},
+						cal_rate=#{cal_rate,jdbcType=VARCHAR},
+						cal_project=#{cal_project,jdbcType=VARCHAR}
+				where CAL_ID =#{CAL_ID,jdbcType=VARCHAR}
+ 
+ </update>
+</mapper>
